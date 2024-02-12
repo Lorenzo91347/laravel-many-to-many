@@ -26,6 +26,25 @@
         </select>
       </div>
       <div class="mb-3">
+        <label for="technology" class="form-label text-warning">Technology</label>
+        @foreach($technologies as $tech)
+        @if ($errors->any())
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="checkbox" id="tag-{{$tag->id}}" value="{{$tech->id}}" name="technologies" 
+          {{$project->technologies->contain($tech->id) ? 'checked': ''}}>
+          <label class="form-check-label" for="tag-{{$tag->id}}">{{$tech->title}}</label>
+        </div>
+          @else
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" id="tag-{{$tag->id}}" value="{{$tech->id}}" name="technologies" 
+              {{in_array($tech->id,old('technologies',[])) ? 'checked': ''}}>
+              <label class="form-check-label" for="tag-{{$tag->id}}">{{$tech->title}}</label>
+            </div>
+          @endif
+        </div>
+        @endforeach
+      </div>
+      <div class="mb-3">
         <label for="post_image" class="form-label text-warning">Add an Image to your Project</label>
         <input class="form-control" type="file" id="post_image" name="post_image">
     </div>

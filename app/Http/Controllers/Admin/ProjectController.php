@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
 use App\Models\Project;
+use App\Models\Technology;
 use App\Models\Type;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -27,8 +28,9 @@ class ProjectController extends Controller
      */
     public function create()
     {
-        $types =Type::all();
-        return view('create',compact('types'));
+        $types = Type::all();
+        $technologies= Technology::all();
+        return view('create',compact('types','technologies'));
     }
 
     /**
@@ -50,6 +52,10 @@ class ProjectController extends Controller
         }
 
         $project->save();
+
+        if(isset($data['tags'])){
+            $project->technologies()->sync($data['technologies']);
+            };
 
         return redirect()->route('show');
     }
@@ -79,6 +85,12 @@ class ProjectController extends Controller
         $data = $request->validated();
         $project ->update($data);
         $project->slug = Str::of($data['title'])->slug('-');
+
+        if(isset($data['tags'])){
+            $project->technologies()->sync($data['technologies']);
+            } else{
+            $project->technologies()->sync([]);
+        }
         return redirect()->route('show');
     }
 
@@ -87,8 +99,16 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project)
     {
+        $project->tags()->sync([]);
+
+
+        if ($project->post_image) {
+            Storage::delete($project->post_image);
+        }
+
+
         $project->delete();
 
-        return redirect()->route('welcome');
+        return redirect()->route('admin.projects.index');
     }
 }
