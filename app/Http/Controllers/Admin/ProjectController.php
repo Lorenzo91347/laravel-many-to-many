@@ -29,8 +29,8 @@ class ProjectController extends Controller
     public function create()
     {
         $types = Type::all();
-        $technologies= Technology::all();
-        return view('create',compact('types','technologies'));
+        $technologies = Technology::all();
+        return view('create', compact('types', 'technologies'));
     }
 
     /**
@@ -38,24 +38,26 @@ class ProjectController extends Controller
      */
     public function store(StoreProjectRequest $request)
     {
-        
+
         $data = $request->validated();
 
+        dd($data);
+
         $project = new Project();
-        
-        $project -> fill($data);
+
+        $project->fill($data);
 
         $project->slug = Str::of($data['title'])->slug('-');
 
-        if (isset($data['post_image'])){
-        $project->post_image = Storage::put('uploads',$data('post_image'));
+        if (isset($data['post_image'])) {
+            $project->post_image = Storage::put('uploads', $data('post_image'));
         }
 
         $project->save();
 
-        if(isset($data['tags'])){
+        if (isset($data['technologies'])) {
             $project->technologies()->sync($data['technologies']);
-            };
+        };
 
         return redirect()->route('show');
     }
@@ -65,7 +67,7 @@ class ProjectController extends Controller
      */
     public function show(Project $project)
     {
-        return view('show',$project->id,compact('project'));
+        return view('show', compact('project'));
     }
 
     /**
@@ -73,7 +75,9 @@ class ProjectController extends Controller
      */
     public function edit(Project $project)
     {
-        return view('edit', compact('project'));
+        $types = Type::all();
+        $technologies = Technology::all();
+        return view('edit', compact('project', 'technologies', 'types'));
     }
 
     /**
@@ -81,17 +85,19 @@ class ProjectController extends Controller
      */
     public function update(UpdateProjectRequest $request, Project $project)
     {
-        
+
         $data = $request->validated();
-        $project ->update($data);
         $project->slug = Str::of($data['title'])->slug('-');
 
-        if(isset($data['tags'])){
+        $project->update($data);
+        //$project->slug = Str::of($data['title'])->slug('-');
+
+        if (isset($data['technologies'])) {
             $project->technologies()->sync($data['technologies']);
-            } else{
+        } else {
             $project->technologies()->sync([]);
         }
-        return redirect()->route('show');
+        return redirect()->route('admin.projects.show', $project->id);
     }
 
     /**
@@ -99,7 +105,7 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project)
     {
-        $project->tags()->sync([]);
+        $project->technologies()->sync([]);
 
 
         if ($project->post_image) {

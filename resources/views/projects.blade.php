@@ -6,6 +6,8 @@
        <li class="list-group-item-dark">{{ $project->title }}</li>
        <li class="list-group-item-dark"> {{ $project->content }}</li>    
        <li class="list-group-item-dark"> {{ $project->slug }}</li>
+       <li class="list-group-item-dark"> {{ $project->type_id }}</li>
+       <img src="{{asset('storage/'. $project->post_image)}}" alt="">
        <li> <a rel="stylesheet" href="{{ route('admin.projects.edit', $project) }}" role="button"
         class="btn btn-primary btn-warning">edit</a></li>
        <li>
