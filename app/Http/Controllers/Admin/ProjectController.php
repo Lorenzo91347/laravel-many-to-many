@@ -50,16 +50,17 @@ class ProjectController extends Controller
         $project->slug = Str::of($data['title'])->slug('-');
 
         if (isset($data['post_image'])) {
-            $project->post_image = Storage::put('uploads', $data('post_image'));
+            $project->post_image = Storage::put('uploads', $data['post_image']);
         }
-
-        $project->save();
-
         if (isset($data['technologies'])) {
             $project->technologies()->sync($data['technologies']);
         };
 
-        return redirect()->route('show');
+        $project->save();
+
+
+
+        return redirect()->route('admin.projects.show');
     }
 
     /**
@@ -88,6 +89,9 @@ class ProjectController extends Controller
 
         $data = $request->validated();
         $project->slug = Str::of($data['title'])->slug('-');
+        if (isset($data['post_image'])) {
+            $project->post_image = Storage::put('storage', $data['post_image']);
+        }
 
         $project->update($data);
         //$project->slug = Str::of($data['title'])->slug('-');
